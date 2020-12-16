@@ -59,6 +59,8 @@ case object Bool extends AtomicType
 case object Perm extends AtomicType
 /** Type for references. */
 case object Ref extends AtomicType
+/** Type for reals. */
+case object Real extends AtomicType
 /** Type used for internal nodes (e.g. typing predicate accesses) - should not be
   * the type of any expression whose value is meaningful in the translation.
   */

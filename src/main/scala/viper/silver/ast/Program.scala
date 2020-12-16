@@ -625,6 +625,10 @@ sealed trait Op extends AbstractDomainFunc with BuiltinDomainFunc {
 sealed trait IntDomainFunc extends AbstractDomainFunc {
   lazy val typ = Int
 }
+/** Domain functions with return type real. */
+sealed trait RealDomainFunc extends AbstractDomainFunc {
+  lazy val typ = Real
+}
 /** Domain functions with return type boolean. */
 sealed trait BoolDomainFunc extends AbstractDomainFunc {
   lazy val typ = Bool
@@ -650,6 +654,12 @@ sealed trait LeftAssoc {
 sealed trait IntBinOp extends BinOp {
   lazy val leftTyp = Int
   lazy val rightTyp = Int
+}
+
+/** Domain functions that represent built-in binary operators where both arguments are reals. */
+sealed trait RealBinOp extends BinOp {
+  lazy val leftTyp = Real
+  lazy val rightTyp = Real
 }
 
 /** Domain functions that represent built-in binary operators where both arguments are booleans. */
@@ -691,6 +701,12 @@ case object MulOp extends ProdOp("*") with IntBinOp with IntDomainFunc
 case object DivOp extends ProdOp("/") with IntBinOp with IntDomainFunc
 case object ModOp extends ProdOp("%") with IntBinOp with IntDomainFunc
 
+// Arithmetic real operators
+case object RealAddOp extends SumOp("+") with RealBinOp with RealDomainFunc
+case object RealSubOp extends SumOp("-") with RealBinOp with RealDomainFunc
+case object RealMulOp extends ProdOp("*") with RealBinOp with RealDomainFunc
+case object RealDivOp extends ProdOp("/") with RealBinOp with RealDomainFunc
+
 // Arithmetic permission operators
 case object PermAddOp extends SumOp("+") with PermBinOp with PermDomainFunc
 case object PermSubOp extends SumOp("-") with PermBinOp with PermDomainFunc
@@ -716,6 +732,14 @@ case object NegOp extends UnOp with IntDomainFunc {
   lazy val fixity = Prefix
 }
 
+/** Real negation. */
+case object RealNegOp extends UnOp with RealDomainFunc {
+  lazy val expTyp = Real
+  lazy val op = "-"
+  lazy val priority = 10
+  lazy val fixity = Prefix
+}
+
 case object PermNegOp extends UnOp with PermDomainFunc {
   lazy val expTyp = Perm
   lazy val op = "-"
@@ -728,6 +752,12 @@ case object LtOp extends RelOp("<") with IntBinOp
 case object LeOp extends RelOp("<=") with IntBinOp
 case object GtOp extends RelOp(">") with IntBinOp
 case object GeOp extends RelOp(">=") with IntBinOp
+
+// Real comparison operators
+case object RealLtOp extends RelOp("<") with RealBinOp
+case object RealLeOp extends RelOp("<=") with RealBinOp
+case object RealGtOp extends RelOp(">") with RealBinOp
+case object RealGeOp extends RelOp(">=") with RealBinOp
 
 // Permission comparison operators
 case object PermLtOp extends RelOp("<") with PermBinOp

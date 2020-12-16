@@ -1,0 +1,24 @@
+function double(r: Real) : Real
+{
+  2.0 * r
+}
+
+method m(r1: Real, r2: Real) returns (res: Real)
+{
+  var r3: Real
+  r3 := -0.1
+  r3 := r3 + r1
+  res := r3 - r1
+  assert res == -0.1
+  res := res * res
+  assert res == 0.01
+  res := res / 2.0
+  assert res == 0.005
+  if (r2 >= 15.02) {
+    //assert r2 <= 15.02
+  }
+  var rs : Set[Real]
+  rs := Set(r2)
+  assert (r2 - 1.4) + 1.5 in rs
+  //assert r2 != 15.02
+}

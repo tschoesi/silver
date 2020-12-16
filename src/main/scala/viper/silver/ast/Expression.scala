@@ -51,7 +51,7 @@ sealed trait Exp extends Hashable with Typed with Positioned with Infoed with Tr
 
 // --- Simple integer and boolean expressions (binary and unary operations, literals)
 
-// Arithmetic expressions
+// Integer arithmetic expressions
 case class Add(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(AddOp) with ForbiddenInTrigger
 case class Sub(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(SubOp) with ForbiddenInTrigger
 case class Mul(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(MulOp) with ForbiddenInTrigger
@@ -63,6 +63,19 @@ case class LtCmp(left: Exp, right: Exp)(val pos: Position = NoPosition, val info
 case class LeCmp(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(LeOp) with ForbiddenInTrigger
 case class GtCmp(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(GtOp) with ForbiddenInTrigger
 case class GeCmp(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(GeOp) with ForbiddenInTrigger
+
+// Real arithmetic expressions
+case class RealAdd(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(RealAddOp) with ForbiddenInTrigger
+case class RealSub(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(RealSubOp) with ForbiddenInTrigger
+case class RealMul(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(RealMulOp) with ForbiddenInTrigger
+case class RealDiv(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(RealDivOp) with ForbiddenInTrigger
+
+// Real comparison expressions
+case class RealLtCmp(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(RealLtOp) with ForbiddenInTrigger
+case class RealLeCmp(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(RealLeOp) with ForbiddenInTrigger
+case class RealGtCmp(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(RealGtOp) with ForbiddenInTrigger
+case class RealGeCmp(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(RealGeOp) with ForbiddenInTrigger
+
 
 // Equality and non-equality (defined for all types)
 case class EqCmp(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends EqualityCmp("==") {
@@ -81,8 +94,16 @@ case class IntLit(i: BigInt)(val pos: Position = NoPosition, val info: Info = No
   lazy val typ = Int
 }
 
+/** Real literal. */
+case class RealLit(i: BigDecimal)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends Literal {
+  lazy val typ = Real
+}
+
 /** Integer unary minus. */
 case class Minus(exp: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainUnExp(NegOp)
+
+/** Real unary minus. */
+case class RealMinus(exp: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainUnExp(RealNegOp)
 
 // Boolean expressions
 case class Or(left: Exp, right: Exp)(val pos: Position = NoPosition, val info: Info = NoInfo, val errT: ErrorTrafo = NoTrafos) extends DomainBinExp(OrOp) with ForbiddenInTrigger {

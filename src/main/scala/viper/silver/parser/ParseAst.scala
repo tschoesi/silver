@@ -181,6 +181,7 @@ object TypeHelper {
   val Ref = PPrimitiv("Ref")
   val Pred = PPredicateType()
   val Wand = PWandType()
+  val Real = PPrimitiv("Real")
 }
 
 // Identifiers (uses and definitions)
@@ -571,24 +572,28 @@ class PBinExp(val left: PExp, val opName: String, val right: PExp) extends POpAp
   val signatures : List[PTypeSubstitution] = opName match {
     case "+" | "-" => List(
       Map(POpApp.pArgS(0) -> Perm, POpApp.pArgS(1) -> Perm, POpApp.pResS -> Perm),
-      Map(POpApp.pArgS(0) -> Int, POpApp.pArgS(1) -> Int, POpApp.pResS -> Int)
+      Map(POpApp.pArgS(0) -> Int, POpApp.pArgS(1) -> Int, POpApp.pResS -> Int),
+      Map(POpApp.pArgS(0) -> Real, POpApp.pArgS(1) -> Real, POpApp.pResS -> Real)
     )
     case "*" => List(
       Map(POpApp.pArgS(0) -> Perm, POpApp.pArgS(1) -> Perm, POpApp.pResS -> Perm),
       Map(POpApp.pArgS(0) -> Int, POpApp.pArgS(1) -> Perm, POpApp.pResS -> Perm),
       Map(POpApp.pArgS(0) -> Perm, POpApp.pArgS(1) -> Int, POpApp.pResS -> Perm),
-      Map(POpApp.pArgS(0) -> Int, POpApp.pArgS(1) -> Int, POpApp.pResS -> Int)
+      Map(POpApp.pArgS(0) -> Int, POpApp.pArgS(1) -> Int, POpApp.pResS -> Int),
+      Map(POpApp.pArgS(0) -> Real, POpApp.pArgS(1) -> Real, POpApp.pResS -> Real)
     )
     case "/" => List(
       Map(POpApp.pArgS(0) -> Int, POpApp.pArgS(1) -> Int, POpApp.pResS -> Perm),
       Map(POpApp.pArgS(0) -> Perm, POpApp.pArgS(1) -> Int, POpApp.pResS -> Perm),
-      Map(POpApp.pArgS(0) -> Int, POpApp.pArgS(1) -> Int, POpApp.pResS -> Int)
+      Map(POpApp.pArgS(0) -> Int, POpApp.pArgS(1) -> Int, POpApp.pResS -> Int),
+      Map(POpApp.pArgS(0) -> Real, POpApp.pArgS(1) -> Real, POpApp.pResS -> Real)
     )
     case "\\" | "%" => List(
       Map(POpApp.pArgS(0) -> Int, POpApp.pArgS(1) -> Int, POpApp.pResS -> Int))
     case "<" | "<=" | ">" | ">=" => List(
       Map(POpApp.pArgS(0) -> Perm, POpApp.pArgS(1) -> Perm, POpApp.pResS -> Bool),
-      Map(POpApp.pArgS(0) -> Int, POpApp.pArgS(1) -> Int, POpApp.pResS -> Bool)
+      Map(POpApp.pArgS(0) -> Int, POpApp.pArgS(1) -> Int, POpApp.pResS -> Bool),
+      Map(POpApp.pArgS(0) -> Real, POpApp.pArgS(1) -> Real, POpApp.pResS -> Bool)
     )
     case "==" | "!=" => List(
       Map(POpApp.pArgS(1) -> POpApp.pArg(0), POpApp.pResS -> Bool))
@@ -658,7 +663,8 @@ case class PUnExp(opName: String, exp: PExp) extends POpApp {
   override val signatures : List[PTypeSubstitution] = opName match {
     case "-" => List(
       Map(POpApp.pArgS(0) -> Int, POpApp.pResS -> Int),
-      Map(POpApp.pArgS(0) -> Perm, POpApp.pResS -> Perm)
+      Map(POpApp.pArgS(0) -> Perm, POpApp.pResS -> Perm),
+      Map(POpApp.pArgS(0) -> Real, POpApp.pResS -> Real)
     )
     case "!" => List(
       Map(POpApp.pArgS(0) -> Bool, POpApp.pResS -> Bool)
@@ -683,6 +689,10 @@ sealed trait PSimpleLiteral extends PExp {
 }
 case class PIntLit(i: BigInt) extends PSimpleLiteral{
   typ = Int
+}
+
+case class PRealLit(i: BigDecimal) extends PSimpleLiteral{
+  typ = Real
 }
 case class PResultLit() extends PSimpleLiteral
 case class PBoolLit(b: Boolean) extends PSimpleLiteral{
@@ -1133,6 +1143,7 @@ object Nodes {
       case PUnExp(_, exp) => Seq(exp)
       case PTrigger(exp) => exp
       case PIntLit(_) => Nil
+      case PRealLit(_) => Nil
       case PBoolLit(_) => Nil
       case PNullLit() => Nil
       case PPredicateType() => Nil

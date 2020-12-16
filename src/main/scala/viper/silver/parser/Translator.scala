@@ -252,12 +252,14 @@ case class Translator(program: PProgram) {
           case "+" =>
             r.typ match {
               case Int => Add(l, r)(pos)
+              case Real => RealAdd(l, r)(pos)
               case Perm => PermAdd(l, r)(pos)
               case _ => sys.error("should not occur in type-checked program")
             }
           case "-" =>
             r.typ match {
               case Int => Sub(l, r)(pos)
+              case Real => RealSub(l, r)(pos)
               case Perm => PermSub(l, r)(pos)
               case _ => sys.error("should not occur in type-checked program")
             }
@@ -275,12 +277,19 @@ case class Translator(program: PProgram) {
                   case Perm => PermMul(l, r)(pos)
                   case _ => sys.error("should not occur in type-checked program")
                 }
+              case Real => RealMul(l, r)(pos)
               case _ => sys.error("should not occur in type-checked program")
             }
           case "/" =>
-            assert(r.typ==Int)
             l.typ match {
-              case Perm => PermDiv(l, r)(pos)
+              case Perm => {
+                assert(r.typ==Int)
+                PermDiv(l, r)(pos)
+              }
+              case Real => {
+                assert(r.typ==Real)
+                RealDiv(l, r)(pos)
+              }
               case Int  =>
                 assert (r.typ==Int)
                 if (ttyp(pbe.typ) == Int)
@@ -294,24 +303,28 @@ case class Translator(program: PProgram) {
           case "<" =>
             l.typ match {
               case Int => LtCmp(l, r)(pos)
+              case Real => RealLtCmp(l, r)(pos)
               case Perm => PermLtCmp(l, r)(pos)
               case _ => sys.error("unexpected type")
             }
           case "<=" =>
             l.typ match {
               case Int => LeCmp(l, r)(pos)
+              case Real => RealLeCmp(l, r)(pos)
               case Perm => PermLeCmp(l, r)(pos)
               case _ => sys.error("unexpected type")
             }
           case ">" =>
             l.typ match {
               case Int => GtCmp(l, r)(pos)
+              case Real => RealGtCmp(l, r)(pos)
               case Perm => PermGtCmp(l, r)(pos)
               case _ => sys.error("unexpected type")
             }
           case ">=" =>
             l.typ match {
               case Int => GeCmp(l, r)(pos)
+              case Real => RealGeCmp(l, r)(pos)
               case Perm => PermGeCmp(l, r)(pos)
               case _ => sys.error("unexpected type")
             }
@@ -340,6 +353,7 @@ case class Translator(program: PProgram) {
           case "-" =>
             e.typ match {
               case Int => Minus(e)(pos)
+              case Real => RealMinus(e)(pos)
               case Perm => PermMinus(e)(pos)
               case _ => sys.error("unexpected type")
             }
@@ -349,6 +363,8 @@ case class Translator(program: PProgram) {
         InhaleExhaleExp(exp(in), exp(ex))(pos)
       case PIntLit(i) =>
         IntLit(i)(pos)
+      case PRealLit(i) =>
+        RealLit(i)(pos)
       case p@PResultLit() =>
         // find function
         var par: PNode = p.parent.get
@@ -521,6 +537,7 @@ case class Translator(program: PProgram) {
       case "Bool" => Bool
       case "Ref" => Ref
       case "Perm" => Perm
+      case "Real" => Real
     }
     case PSeqType(elemType) =>
       SeqType(ttyp(elemType))

@@ -744,7 +744,7 @@ object FastParser {
 
   lazy val keywords = Set("result",
     // types
-    "Int", "Perm", "Bool", "Ref", "Rational",
+    "Int", "Perm", "Bool", "Ref", "Rational", "Real",
     // boolean constants
     "true", "false",
     // null
@@ -777,7 +777,7 @@ object FastParser {
     "unique") | ParserExtension.extendedKeywords
 
 
-  def atom(implicit ctx : P[_]) : P[PExp] = P(ParserExtension.newExpAtStart(ctx) | integer | booltrue | boolfalse | nul | old
+  def atom(implicit ctx : P[_]) : P[PExp] = P(ParserExtension.newExpAtStart(ctx) | real | integer | booltrue | boolfalse | nul | old
     | result | unExp
     | "(" ~ exp ~ ")" | accessPred | inhaleExhale | perm | let | quant | forperm | unfolding | applying
     | setTypedEmpty | explicitSetNonEmpty | multiSetTypedEmpty | explicitMultisetNonEmpty | seqTypedEmpty
@@ -790,7 +790,11 @@ object FastParser {
 
   def strInteger[_: P]: P[String] = P(CharIn("0-9").rep(1)).!
 
+  def strReal[_: P]: P[String] = P(CharIn("0-9").rep(1) ~~ "." ~~ CharIn("0-9").rep(1)).!
+
   def integer[_: P]: P[PIntLit] = strInteger.filter(s => !s.contains(' ')).map { s => PIntLit(BigInt(s)) }
+
+  def real[_: P]: P[PRealLit] = strReal.filter(s => !s.contains(' ')).map { s => PRealLit(BigDecimal(s)) }
 
   def booltrue[_: P]: P[PBoolLit] = P(keyword("true")).map(_ => PBoolLit(b = true))
 
@@ -1018,7 +1022,7 @@ object FastParser {
   def multisetType[_: P]: P[PType] = P(keyword("Multiset") ~ "[" ~ typ ~ "]").map( t => PMultisetType(t._3))
 
   def primitiveTyp[_: P]: P[PType] = P(keyword("Rational").map(_ => PPrimitiv("Perm"))
-    | (StringIn("Int", "Bool", "Perm", "Ref") ~~ !identContinues).!.map(PPrimitiv))
+    | (StringIn("Int", "Bool", "Perm", "Ref", "Real") ~~ !identContinues).!.map(PPrimitiv))
 
   def trigger[_: P]: P[PTrigger] = P("{" ~/ exp.rep(sep = ",") ~ "}").map(
     s => {

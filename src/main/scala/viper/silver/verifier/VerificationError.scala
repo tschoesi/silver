@@ -49,6 +49,7 @@ object CounterexampleTransformer {
 object Model {
 
   def apply(modelString: String) : Model = {
+    print(modelString)
     fastparse.parse(modelString, ModelParser.model(_)) match{
       case Parsed.Success(m, index) => return m
       case f@Parsed.Failure(last, index, extra) => throw new Exception(f.toString)

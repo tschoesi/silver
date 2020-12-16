@@ -615,6 +615,7 @@ object FastPrettyPrinter extends FastPrettyPrinterBase with BracketPrettyPrinter
       case Int => "Int"
       case Ref => "Ref"
       case Perm => "Perm"
+      case Real => "Real"
       case InternalType => "InternalType"
       case Wand => "$WandType"
       case SeqType(elemType) => text("Seq") <> "[" <> show(elemType) <> "]"
@@ -715,6 +716,7 @@ object FastPrettyPrinter extends FastPrettyPrinterBase with BracketPrettyPrinter
 
   override def toParenDoc(e: PrettyExpression): Cont = e match {
     case IntLit(i) => value(i)
+    case RealLit(r) => value(r)
     case BoolLit(b) => value(b)
     case NullLit() => value(null)
     case AbstractLocalVar(n) => n
